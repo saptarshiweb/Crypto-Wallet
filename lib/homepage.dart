@@ -18,10 +18,15 @@ class _HomePageState extends State<HomePage> {
 
   double balance = 5000;
   bool flag = false;
+  String tranasactionType = '';
 
   addTransaction(BuildContext context) {
     setState(() {
-      balance = balance + double.parse(money.text);
+      if (tranasactionType == 'receive' || tranasactionType == 'add') {
+        balance = balance + double.parse(money.text);
+      } else {
+        balance = balance - double.parse(money.text);
+      }
       array.add(double.parse(money.text));
       flag = true;
       money.text = '';
@@ -95,7 +100,12 @@ class _HomePageState extends State<HomePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  transactionShow = true;
+                                  tranasactionType = 'receive';
+                                });
+                              },
                               icon: const Icon(
                                   EvaIcons.diagonalArrowLeftDownOutline,
                                   color: Colors.white,
@@ -124,6 +134,7 @@ class _HomePageState extends State<HomePage> {
                               onPressed: () {
                                 setState(() {
                                   transactionShow = true;
+                                  tranasactionType = 'add';
                                 });
                               },
                               icon: const Icon(EvaIcons.plusCircleOutline,
@@ -149,7 +160,12 @@ class _HomePageState extends State<HomePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  transactionShow = true;
+                                  tranasactionType = 'send';
+                                });
+                              },
                               icon: const Icon(
                                   EvaIcons.diagonalArrowLeftUpOutline,
                                   color: Colors.white,
