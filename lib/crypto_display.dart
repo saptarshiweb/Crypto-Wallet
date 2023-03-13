@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -20,12 +21,19 @@ class _CryptoDisplayState extends State<CryptoDisplay> {
   List<String> change = [];
   Color bgColor = const Color.fromARGB(255, 11, 0, 17);
   TextEditingController controller = TextEditingController();
+  int selectedIndex = 0;
+
+  bool showCryptoData = false;
+  bool showTransactionData = true;
+
+  bool showBuyOption = false;
 
   String url =
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=7d";
 
-  Future fetchCrypto() async {
+  fetchCrypto() async {
     List<CryptoModel> list = [];
+    print('hello');
     final response = await http.get(
       Uri.parse(url),
       headers: <String, String>{
@@ -38,62 +46,15 @@ class _CryptoDisplayState extends State<CryptoDisplay> {
     );
 
     var responseData = json.decode(response.body);
-    // print(responseData);
+    print(responseData);
 
     for (int i = 0; i < responseData.length; i++) {
-      name.add(responseData[i]['name']);
-      image.add(responseData[i]['image']);
-      price.add(responseData[i]['current_price'].toString());
+      setState(() {
+        name.add(responseData[i]['name']);
+        image.add(responseData[i]['image']);
+        price.add(responseData[i]['current_price'].toString());
+      });
     }
-    print(name[0]);
-  }
-
-  buyCrypto(BuildContext context, String price) {
-    showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        builder: (context) {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.cancel_rounded,
-                          color: Colors.white, size: 22)),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.purple.shade900,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Text('Price $price'),
-                            const SizedBox(height: 10),
-                            TextField(
-                              controller: controller,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  labelText: 'Enter Order Value',
-                                  labelStyle: TextStyle(color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
   }
 
   @override
@@ -120,94 +81,214 @@ class _CryptoDisplayState extends State<CryptoDisplay> {
                 Expanded(
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple.shade600),
+                        backgroundColor: (showCryptoData == true)
+                            ? Colors.purple.shade900
+                            : bgColor,
+                      ),
                       onPressed: () async {
+                        setState(() {
+                          showCryptoData = true;
+                          showTransactionData = false;
+                        });
+
                         fetchCrypto();
                       },
-                      child: const Text(
-                        'Fetch Details',
-                        style: TextStyle(color: Colors.white),
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 15),
+                        child: Text(
+                          'Fetch Details',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: (showTransactionData == true)
+                            ? Colors.purple.shade900
+                            : bgColor,
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          showCryptoData = false;
+                          showTransactionData = true;
+                        });
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 15),
+                        child: Text(
+                          'Transactions',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       )),
                 ),
               ],
             ),
-            const SizedBox(height: 30),
-            Expanded(
-              child: SizedBox(
-                height: 300,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: name.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 1.4, color: Colors.white),
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: Image.network(
-                                        image[index],
-                                        fit: BoxFit.contain,
+            const SizedBox(height: 20),
+            (showBuyOption == true) ? buyCrypto(context) : const SizedBox(),
+            const SizedBox(height: 10),
+            (showCryptoData == true)
+                ? Expanded(
+                    child: SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: name.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 2.8,
+                                        color: Colors.purple.shade700),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: Image.network(
+                                              image[index],
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            name[index],
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const Spacer(),
+                                          Text(
+                                            "\$ ${price[index]}",
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      name[index],
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      "\$ ${price[index]}",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors
+                                                      .deepPurple.shade600),
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedIndex = index;
+                                                  showBuyOption = true;
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(12.0),
+                                                child: Text(
+                                                  'Buy ${name[index]}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.deepPurple.shade600),
-                                        onPressed: () {
-                                          buyCrypto(context, price[index]);
-                                        },
-                                        child: Text(
-                                          'Buy ${name[index]}',
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-              ),
+                              ),
+                            );
+                          }),
+                    ),
+                  )
+                : const SizedBox(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buyCrypto(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.purple.shade900, width: 1.5),
+          borderRadius: BorderRadius.circular(4)),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text(
+                  'Buy ${name[selectedIndex]}',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showBuyOption = false;
+                      });
+                    },
+                    icon: const Icon(EvaIcons.closeCircleOutline,
+                        color: Colors.white, size: 32)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide:
+                          BorderSide(color: Colors.purple.shade900, width: 2)),
+                  labelText: 'Enter Amount to be purchased',
+                  labelStyle: const TextStyle(color: Colors.white)),
+            ),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple.shade600),
+                    onPressed: () {},
+                    child: const Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Text(
+                        'Confirm',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             )
           ],
         ),

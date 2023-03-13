@@ -256,8 +256,7 @@ class _HomePageState extends State<HomePage> {
   Widget transactionTile(BuildContext context, String value, int index) {
     return Container(
       decoration: BoxDecoration(
-          border:
-              Border.all(color: Colors.deepPurpleAccent.shade700, width: 1.2),
+          border: Border.all(color: Colors.purple.shade900, width: 1.2),
           borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -305,8 +304,8 @@ class _HomePageState extends State<HomePage> {
   Widget transaction(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.deepPurple.shade600,
-          borderRadius: BorderRadius.circular(12)),
+          border: Border.all(color: Colors.purple.shade900, width: 3),
+          borderRadius: BorderRadius.circular(4)),
       child: Padding(
         padding:
             const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
@@ -329,15 +328,24 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                     icon:
-                        const Icon(Icons.cancel, color: Colors.black, size: 22))
+                        const Icon(Icons.cancel, color: Colors.white, size: 26))
               ],
             ),
+            const SizedBox(height: 14),
             TextField(
               controller: money,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide:
+                          BorderSide(color: Colors.purple.shade900, width: 2)),
                   labelText: 'Enter Transaction Value',
-                  labelStyle: TextStyle(color: Colors.white)),
+                  labelStyle: const TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 10),
             Row(
@@ -345,7 +353,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black),
+                          backgroundColor: Colors.purple.shade900),
                       onPressed: () {
                         addTransaction(context);
                         setState(() {
