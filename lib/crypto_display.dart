@@ -152,8 +152,8 @@ class _CryptoDisplayState extends State<CryptoDisplay> {
                                       Row(
                                         children: [
                                           SizedBox(
-                                            height: 20,
-                                            width: 20,
+                                            height: 30,
+                                            width: 40,
                                             child: Image.network(
                                               image[index],
                                               fit: BoxFit.contain,

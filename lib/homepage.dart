@@ -256,8 +256,8 @@ class _HomePageState extends State<HomePage> {
   Widget transactionTile(BuildContext context, String value, int index) {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Colors.purple.shade900, width: 1.2),
-          borderRadius: BorderRadius.circular(12)),
+          border: Border.all(color: Colors.purple.shade900, width: 2.5),
+          borderRadius: BorderRadius.circular(4)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
